@@ -5,7 +5,6 @@
 
 typedef struct {
   int index;
-  int length;
   CRGB color;
 } handpos;
 
@@ -14,7 +13,7 @@ class Face
 public:
   Face(int max, int nHands);
   void begin();
-  void setHand(int hand, int index, int length, CRGB color);
+  void setHand(int hand, handpos pos);
   CRGB* leds;
   int max;
 private:  
