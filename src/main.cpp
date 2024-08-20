@@ -5,11 +5,11 @@
 #include <Clock.h>
 #include <Face.h>
 
-#define OUTER_RING  12
-#define INNER_RING  14
+#define OUTER_RING  14
+#define INNER_RING  12
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define BRIGHTNESS  64
+#define BRIGHTNESS  255
 
 Clock clock1(UTC_OFFSET, USE_DST);
 Face outer(60, 2);
@@ -42,14 +42,14 @@ void loop() {
   struct tm timeinfo;
   clock1.update(&timeinfo);
 
-  Serial.printf("%d:%d:%d\n", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+  // Serial.printf("%d:%d:%d\n", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
   CRGB secondHandColor = CRGB::Red;
   CRGB minuteHandColor = CRGB::Blue;
   CRGB hourHandColor = CRGB::Green;
 
   outer.setHand(0, timeinfo.tm_sec, 1, secondHandColor);
-  outer.setHand(0, timeinfo.tm_min, 1, minuteHandColor);
+  outer.setHand(1, timeinfo.tm_min, 1, minuteHandColor);
   inner.setHand(0, timeinfo.tm_hour % 12, 2, hourHandColor);
 
   FastLED.show();

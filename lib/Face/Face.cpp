@@ -11,6 +11,14 @@ void Face::begin()
 {
   this->positions = (handpos*)malloc(sizeof(handpos) * this->nHands);
   this->leds = (CRGB*)malloc(sizeof(CRGB) * this->max);
+  for (int i = 0; i < nHands; i++) {
+    this->positions[i].index = 0;
+    this->positions[i].length = 0;
+    this->positions[i].color = 0;
+  }
+  for (int i = 0; i < max; i++) {
+    this->leds[i] = 0;
+  }
 }
 
 void Face::setHand(int hand, int index, int length, CRGB color)
@@ -39,8 +47,10 @@ void Face::setHand(int hand, int index, int length, CRGB color)
     }
   }
 
-  for (int j = this->positions[hand].index; j < this->positions[hand].index + this->positions[hand].length; j++) {
-    this->leds[j] = 0;
+  if (needsClear) {
+    for (int j = this->positions[hand].index; j < this->positions[hand].index + this->positions[hand].length; j++) {
+      this->leds[j] = 0;
+    }
   }
 
   this->positions[hand].index = index;
