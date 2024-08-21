@@ -4,6 +4,7 @@
 #include <credentials.h>
 #include <Clock.h>
 #include <Face.h>
+#include <GradientColor.h>
 
 #define OUTER_RING  14
 #define INNER_RING  12
@@ -12,6 +13,8 @@
 #define BRIGHTNESS  255
 
 Clock clock1(UTC_OFFSET, USE_DST);
+float hues[3] = {0.65,0.12,0};
+GradientColor c(hues, 3, 1, 0.5);
 Face outer(60, 2);
 Face inner(24, 1);
 
@@ -42,15 +45,14 @@ void loop() {
   struct tm timeinfo;
   clock1.update(&timeinfo);
 
-  // Serial.printf("%d:%d:%d\n", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+  float pct = (float)(timeinfo.tm_sec + (timeinfo.tm_min * 60) + (timeinfo.tm_hour * 60 * 60)) / 86400.0;
 
-  CRGB secondHandColor = CRGB::Red;
-  CRGB minuteHandColor = CRGB::Blue;
-  CRGB hourHandColor = CRGB::Green;
+  CRGB color;
+  c.getColor(pct, &color);
 
-  outer.setHand(0, handpos{.index = timeinfo.tm_sec,            .color = secondHandColor});
-  outer.setHand(1, handpos{.index = timeinfo.tm_min,            .color = minuteHandColor});
-  inner.setHand(0, handpos{.index = timeinfo.tm_hour % 12 * 2,  .color = hourHandColor});
+  outer.setHand(0, handpos{.index = timeinfo.tm_sec,            .color = color});
+  outer.setHand(1, handpos{.index = timeinfo.tm_min,            .color = color});
+  inner.setHand(0, handpos{.index = timeinfo.tm_hour % 12 * 2,  .color = color});
 
   FastLED.show();
   FastLED.delay(10);
