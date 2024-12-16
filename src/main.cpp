@@ -6,11 +6,15 @@
 #include <Face.h>
 #include <GradientColor.h>
 
-#define OUTER_RING  14
-#define INNER_RING  12
-#define LED_TYPE    WS2811
-#define COLOR_ORDER GRB
-#define BRIGHTNESS  255
+#define OUTER_RING_PIN  14
+#define INNER_RING_PIN  12
+#define LED_TYPE        WS2811
+#define COLOR_ORDER     GRB
+#define BRIGHTNESS      255
+#define OUTER_OFFSET    0
+#define INNER_OFFSET    0
+
+#define TEST_MODE
 
 Clock clock1(UTC_OFFSET, USE_DST);
 float hues[3] = {0.65,0.12,0};
@@ -36,12 +40,21 @@ void setup() {
   inner.begin();
 
   delay( 1000 ); // power-up safety delay
-  FastLED.addLeds<LED_TYPE, OUTER_RING, COLOR_ORDER>(outer.leds, outer.max).setCorrection( TypicalLEDStrip );
-  FastLED.addLeds<LED_TYPE, INNER_RING, COLOR_ORDER>(inner.leds, inner.max).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, OUTER_RING_PIN, COLOR_ORDER>(outer.leds, outer.max).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, INNER_RING_PIN, COLOR_ORDER>(inner.leds, inner.max).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
+
+#ifdef TEST_MODE
+  CRGB color = CRGB::White;
+  outer.setHand(0, handpos{.index = OUTER_OFFSET, .color = color});
+  inner.setHand(0, handpos{.index = INNER_OFFSET, .color = color});
+  FastLED.show();
+  FastLED.delay(1000);
+#endif
 }
 
 void loop() {
+#ifndef TEST_MODE
   struct tm timeinfo;
   clock1.update(&timeinfo);
 
@@ -50,10 +63,15 @@ void loop() {
   CRGB color;
   c.getColor(pct, &color);
 
-  outer.setHand(0, handpos{.index = timeinfo.tm_sec,            .color = color});
-  outer.setHand(1, handpos{.index = timeinfo.tm_min,            .color = color});
-  inner.setHand(0, handpos{.index = timeinfo.tm_hour % 12 * 2,  .color = color});
+  int secs = (timeinfo.tm_sec + OUTER_OFFSET) % 60;
+  int minutes = (timeinfo.tm_min + OUTER_OFFSET) % 60;
+  int hours = ((timeinfo.tm_hour % 12 * 2) + INNER_OFFSET) % 24;
+
+  outer.setHand(0, handpos{.index = secs,     .color = color});
+  outer.setHand(1, handpos{.index = minutes,  .color = color});
+  inner.setHand(0, handpos{.index = hours,    .color = color});
 
   FastLED.show();
   FastLED.delay(10);
+#endif
 }
