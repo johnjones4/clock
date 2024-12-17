@@ -15,17 +15,23 @@
 #define INNER_OFFSET    0
 
 // #define TEST_MODE
+#define NO_LIGHTS
 
 Clock clock1(UTC_OFFSET, USE_DST);
+
+#ifndef NO_LIGHTS
 float hues[3] = {0.65,0.12,0};
 GradientColor c(hues, 3, 1, 0.5);
 Face outer(60, 2);
 Face inner(24, 1);
+#endif
 
 void setup() {
   Serial.begin(115200);
 
   Serial.println("Starting up");
+
+#ifndef NO_LIGHTS
 
   outer.begin();
   inner.begin();
@@ -40,6 +46,7 @@ void setup() {
   inner.setHand(0, handpos{.index = INNER_OFFSET, .color = color});
   FastLED.show();
   FastLED.delay(1000);
+#endif
 
 #ifndef TEST_MODE
   Serial.printf("Connecting to %s ", WIFI_SSID);
@@ -52,8 +59,7 @@ void setup() {
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-
-  clock1.begin();  
+  clock1.begin();
 #endif
   Serial.println("Ready");
 }
@@ -63,6 +69,7 @@ void loop() {
   struct tm timeinfo;
   clock1.update(&timeinfo);
 
+#ifndef NO_LIGHTS
   float pct = (float)(timeinfo.tm_sec + (timeinfo.tm_min * 60) + (timeinfo.tm_hour * 60 * 60)) / 86400.0;
 
   CRGB color;
@@ -78,5 +85,6 @@ void loop() {
 
   FastLED.show();
   FastLED.delay(10);
+#endif
 #endif
 }
