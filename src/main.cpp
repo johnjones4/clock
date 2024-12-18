@@ -6,7 +6,7 @@
 #include <Face.h>
 #include <GradientColor.h>
 
-#define OUTER_RING_PIN  20
+#define OUTER_RING_PIN  10
 #define INNER_RING_PIN  8
 #define LED_TYPE        WS2811
 #define COLOR_ORDER     GRB
@@ -15,7 +15,7 @@
 #define INNER_OFFSET    0
 
 // #define TEST_MODE
-#define NO_LIGHTS
+// #define NO_LIGHTS
 
 Clock clock1(UTC_OFFSET, USE_DST);
 
