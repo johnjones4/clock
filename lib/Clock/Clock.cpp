@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-Clock::Clock(int utcOffset, bool useDST)
+Clock::Clock(long utcOffset, bool useDST)
 {
   this->ntpUDP = new WiFiUDP();
   this->client = new NTPClient(*this->ntpUDP);
@@ -21,12 +21,11 @@ void Clock::update(struct tm *timeinfo)
   this->client->update();
   long unix_timestamp = this->client->getEpochTime();
 
-  int dst_offset = 0;
-  if (this->useDST) {
-    dst_offset = this->isDST(unix_timestamp) ? 1 : 0;
-  }
+  unix_timestamp += this->utcOffset * 3600;
 
-  unix_timestamp += (this->utcOffset + dst_offset) * 3600;
+  if (this->useDST && this->isDST(unix_timestamp)) {
+    unix_timestamp += 3600;
+  }
 
   gmtime_r(&unix_timestamp, timeinfo);
 }

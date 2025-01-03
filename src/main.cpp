@@ -14,7 +14,7 @@
 #define OUTER_OFFSET    0
 #define INNER_OFFSET    0
 
-// #define TEST_MODE
+// #define LIGHT_TEST_MODE
 // #define NO_LIGHTS
 
 Clock clock1(UTC_OFFSET, USE_DST);
@@ -48,7 +48,7 @@ void setup() {
   FastLED.delay(1000);
 #endif
 
-#ifndef TEST_MODE
+#ifndef LIGHT_TEST_MODE
   Serial.printf("Connecting to %s ", WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED) {
@@ -65,23 +65,30 @@ void setup() {
 }
 
 void loop() {
-#ifndef TEST_MODE
+#ifndef LIGHT_TEST_MODE
   struct tm timeinfo;
   clock1.update(&timeinfo);
 
 #ifndef NO_LIGHTS
-  float pct = (float)(timeinfo.tm_sec + (timeinfo.tm_min * 60) + (timeinfo.tm_hour * 60 * 60)) / 86400.0;
+  float hourPcnt = ((float)timeinfo.tm_hour) / 24.0;
+  float minutePcnt = ((float)timeinfo.tm_min) / 60.0;
+  float secondPcnt = ((float)timeinfo.tm_sec) / 60.0;
 
-  CRGB color;
-  c.getColor(pct, &color);
+  CRGB hourColor;
+  CRGB minuteColor;
+  CRGB secondColor;
+
+  c.getColor(hourPcnt, &hourColor);
+  c.getColor(minutePcnt, &minuteColor);
+  c.getColor(secondPcnt, &secondColor);
 
   int secs = (timeinfo.tm_sec + OUTER_OFFSET) % 60;
   int minutes = (timeinfo.tm_min + OUTER_OFFSET) % 60;
   int hours = ((timeinfo.tm_hour % 12 * 2) + INNER_OFFSET) % 24;
 
-  outer.setHand(0, handpos{.index = secs,     .color = color});
-  outer.setHand(1, handpos{.index = minutes,  .color = color});
-  inner.setHand(0, handpos{.index = hours,    .color = color});
+  outer.setHand(0, handpos{.index = secs,     .color = secondColor});
+  outer.setHand(1, handpos{.index = minutes,  .color = minuteColor});
+  inner.setHand(0, handpos{.index = hours,    .color = hourColor});
 
   FastLED.show();
   FastLED.delay(10);

@@ -9,7 +9,7 @@
 class Clock
 {
 public:
-  Clock(int utcOffset, bool useDST);
+  Clock(long utcOffset, bool useDST);
   void begin();
   void update(struct tm *timeinfo);
 private:
@@ -17,8 +17,8 @@ private:
 
   WiFiUDP *ntpUDP;
   NTPClient *client;
-  int utcOffset;
+  long utcOffset;
   bool useDST;
 };
 
-#endif Clock_H
+#endif

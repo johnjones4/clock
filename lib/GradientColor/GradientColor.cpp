@@ -72,8 +72,8 @@ void GradientColor::getColor(float pcnt, CRGB* rgb)
 {
   int idx;
   float truePcnt = computeRealPercentage(nHues, pcnt, &idx);
-  int a = hues[idx % nHues];
-  int b = hues[(idx + 1) % nHues];
+  float a = hues[idx % nHues];
+  float b = hues[(idx + 1) % nHues];
   float hue = computeValue(a, b, truePcnt);
   hsl_to_rgb(hue, saturation, lightness, rgb);
 };
